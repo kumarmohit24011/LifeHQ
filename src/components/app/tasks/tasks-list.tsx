@@ -53,7 +53,7 @@ export function TasksList() {
         </div>
       </header>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredTasks.map(task => (
           <TaskCard key={task.id} task={task} onEdit={handleEdit} />
         ))}
@@ -68,7 +68,7 @@ export function TasksList() {
 
       <Button 
         onClick={handleAddNew}
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-40"
+        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-50"
         size="icon"
       >
         <Plus className="h-8 w-8" />

@@ -107,7 +107,7 @@ export function AddEditNoteDialog({ isOpen, setIsOpen, note }: AddEditNoteDialog
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Your notes here..." className="min-h-[200px]" {...field} />
+                    <Textarea placeholder="Your notes here..." className="min-h-[300px]" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

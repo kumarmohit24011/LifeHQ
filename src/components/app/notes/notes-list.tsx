@@ -52,7 +52,7 @@ export function NotesList() {
         </div>
       </header>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredNotes.map(note => (
           <NoteCard key={note.id} note={note} onEdit={handleEdit} />
         ))}
@@ -67,7 +67,7 @@ export function NotesList() {
 
       <Button 
         onClick={handleAddNew}
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-40"
+        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-50"
         size="icon"
       >
         <Plus className="h-8 w-8" />
