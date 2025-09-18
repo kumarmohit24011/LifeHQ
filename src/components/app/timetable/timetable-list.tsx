@@ -134,7 +134,7 @@ export function TimetableList() {
 
       <Button 
         onClick={handleAddNew}
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg"
+        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg z-40"
         size="icon"
       >
         <Plus className="h-8 w-8" />
