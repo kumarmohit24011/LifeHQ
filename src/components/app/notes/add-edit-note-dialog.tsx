@@ -41,14 +41,14 @@ interface AddEditNoteDialogProps {
 }
 
 export function AddEditNoteDialog({ isOpen, setIsOpen, note }: AddEditNoteDialogProps) {
-  const { setNotes } = useAppContext();
+  const { addNote, updateNote } = useAppContext();
   const { toast } = useToast();
 
   const form = useForm<NoteFormValues>({
     resolver: zodResolver(noteSchema),
     defaultValues: {
-      title: note?.title || '',
-      content: note?.content || '',
+      title: '',
+      content: '',
     },
   });
 
@@ -61,16 +61,19 @@ export function AddEditNoteDialog({ isOpen, setIsOpen, note }: AddEditNoteDialog
     }
   }, [isOpen, note, form]);
 
-  const onSubmit = (data: NoteFormValues) => {
-    if (note) {
-      setNotes(prev => prev.map(n => n.id === note.id ? { ...note, ...data } : n));
-      toast({ title: "Note updated!" });
-    } else {
-      const newNote: Note = { id: crypto.randomUUID(), ...data, createdAt: new Date() };
-      setNotes(prev => [newNote, ...prev]);
-      toast({ title: "Note created!" });
+  const onSubmit = async (data: NoteFormValues) => {
+    try {
+      if (note) {
+        await updateNote({ ...note, ...data });
+        toast({ title: "Note updated!" });
+      } else {
+        await addNote(data);
+        toast({ title: "Note created!" });
+      }
+      setIsOpen(false);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Could not save note."});
     }
-    setIsOpen(false);
   };
 
   return (

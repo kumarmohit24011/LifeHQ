@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import type { Task, Priority } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/app-context";
+import { useToast } from "@/hooks/use-toast";
 
 interface TaskCardProps {
   task: Task;
@@ -23,14 +24,24 @@ const priorityColors: Record<Priority, string> = {
 };
 
 export function TaskCard({ task, onEdit }: TaskCardProps) {
-  const { setTasks } = useAppContext();
+  const { toggleTaskCompleted, deleteTask } = useAppContext();
+  const { toast } = useToast();
 
-  const handleToggleComplete = () => {
-    setTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: !t.completed } : t));
+  const handleToggleComplete = async () => {
+    try {
+      await toggleTaskCompleted(task.id);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Could not update task status."});
+    }
   };
 
-  const handleDelete = () => {
-    setTasks(prev => prev.filter(t => t.id !== task.id));
+  const handleDelete = async () => {
+    try {
+      await deleteTask(task.id);
+      toast({ title: "Task deleted!" });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Could not delete task."});
+    }
   };
 
   return (

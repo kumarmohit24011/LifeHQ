@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, MoreVertical, Wand2, Loader2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -14,7 +14,7 @@ import { optimizeTimetable } from '@/ai/flows/ai-optimize-timetable';
 import { format } from 'date-fns';
 
 export function TimetableList() {
-  const { timetable, setTimetable, tasks } = useAppContext();
+  const { timetable, deleteTimetableEntry, tasks } = useAppContext();
   const { toast } = useToast();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -34,8 +34,13 @@ export function TimetableList() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    setTimetable(prev => prev.filter(entry => entry.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteTimetableEntry(id);
+      toast({ title: "Timetable entry deleted!" });
+    } catch(error) {
+      toast({ variant: "destructive", title: "Error", description: "Could not delete timetable entry."});
+    }
   };
   
   const handleOptimize = async () => {

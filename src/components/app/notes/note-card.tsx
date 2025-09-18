@@ -7,6 +7,7 @@ import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { Note } from "@/lib/types";
 import { useAppContext } from "@/context/app-context";
+import { useToast } from "@/hooks/use-toast";
 
 interface NoteCardProps {
   note: Note;
@@ -14,10 +15,16 @@ interface NoteCardProps {
 }
 
 export function NoteCard({ note, onEdit }: NoteCardProps) {
-  const { setNotes } = useAppContext();
+  const { deleteNote } = useAppContext();
+  const { toast } = useToast();
 
-  const handleDelete = () => {
-    setNotes(prev => prev.filter(n => n.id !== note.id));
+  const handleDelete = async () => {
+    try {
+      await deleteNote(note.id);
+      toast({ title: "Note deleted!" });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Could not delete note."});
+    }
   };
   
   return (

@@ -44,15 +44,15 @@ interface AddEditTimetableEntryDialogProps {
 }
 
 export function AddEditTimetableEntryDialog({ isOpen, setIsOpen, entry }: AddEditTimetableEntryDialogProps) {
-  const { setTimetable } = useAppContext();
+  const { addTimetableEntry, updateTimetableEntry } = useAppContext();
   const { toast } = useToast();
 
   const form = useForm<EntryFormValues>({
     resolver: zodResolver(entrySchema),
     defaultValues: {
-      subject: entry?.subject || '',
-      startTime: entry?.startTime || '09:00',
-      endTime: entry?.endTime || '10:00',
+      subject: '',
+      startTime: '09:00',
+      endTime: '10:00',
     },
   });
 
@@ -66,16 +66,19 @@ export function AddEditTimetableEntryDialog({ isOpen, setIsOpen, entry }: AddEdi
     }
   }, [isOpen, entry, form]);
 
-  const onSubmit = (data: EntryFormValues) => {
-    if (entry) {
-      setTimetable(prev => prev.map(e => e.id === entry.id ? { ...entry, ...data } : e));
-      toast({ title: "Timetable entry updated!" });
-    } else {
-      const newEntry: TimetableEntry = { id: crypto.randomUUID(), ...data };
-      setTimetable(prev => [...prev, newEntry]);
-      toast({ title: "Timetable entry created!" });
+  const onSubmit = async (data: EntryFormValues) => {
+    try {
+      if (entry) {
+        await updateTimetableEntry({ ...entry, ...data });
+        toast({ title: "Timetable entry updated!" });
+      } else {
+        await addTimetableEntry(data);
+        toast({ title: "Timetable entry created!" });
+      }
+      setIsOpen(false);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Could not save timetable entry."});
     }
-    setIsOpen(false);
   };
 
   return (

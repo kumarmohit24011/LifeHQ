@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -50,21 +50,21 @@ interface AddEditTaskDialogProps {
 }
 
 export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialogProps) {
-  const { tasks, timetable, setTasks } = useAppContext();
+  const { tasks, timetable, addTask, updateTask } = useAppContext();
   const { toast } = useToast();
   const [isAiLoading, setIsAiLoading] = useState(false);
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      title: task?.title || '',
-      description: task?.description || '',
-      priority: task?.priority || 'Medium',
-      deadline: task?.deadline || new Date(),
+      title: '',
+      description: '',
+      priority: 'Medium',
+      deadline: new Date(),
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       form.reset({
         title: task?.title || '',
@@ -75,16 +75,19 @@ export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialog
     }
   }, [isOpen, task, form]);
 
-  const onSubmit = (data: TaskFormValues) => {
-    if (task) {
-      setTasks(prev => prev.map(t => t.id === task.id ? { ...task, ...data } : t));
-      toast({ title: "Task updated!" });
-    } else {
-      const newTask: Task = { id: crypto.randomUUID(), ...data, completed: false };
-      setTasks(prev => [newTask, ...prev]);
-      toast({ title: "Task created!" });
+  const onSubmit = async (data: TaskFormValues) => {
+    try {
+      if (task) {
+        await updateTask({ ...task, ...data });
+        toast({ title: "Task updated!" });
+      } else {
+        await addTask(data);
+        toast({ title: "Task created!" });
+      }
+      setIsOpen(false);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: "Could not save task."});
     }
-    setIsOpen(false);
   };
 
   const handleSuggestDetails = async () => {
