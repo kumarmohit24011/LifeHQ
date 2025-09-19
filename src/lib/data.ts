@@ -1,39 +1,6 @@
 import type { Task, TimetableEntry, Note } from './types';
 
-export const initialTasks: Task[] = [
-  {
-    id: 'task-1',
-    title: 'Finish Q3 Report',
-    description: 'Compile all data and write the final report for the third quarter.',
-    priority: 'High',
-    deadline: new Date(new Date().setDate(new Date().getDate() + 3)),
-    completed: false,
-  },
-  {
-    id: 'task-2',
-    title: 'Plan Team Offsite',
-    description: 'Finalize venue, activities, and budget for the upcoming team offsite.',
-    priority: 'Medium',
-    deadline: new Date(new Date().setDate(new Date().getDate() + 7)),
-    completed: false,
-  },
-  {
-    id: 'task-3',
-    title: 'Update Design System',
-    description: 'Incorporate new components into the main design system library.',
-    priority: 'Medium',
-    deadline: new Date(new Date().setDate(new Date().getDate() + 10)),
-    completed: true,
-  },
-  {
-    id: 'task-4',
-    title: 'Book Dentist Appointment',
-    description: 'Schedule a routine check-up.',
-    priority: 'Low',
-    deadline: new Date(new Date().setDate(new Date().getDate() + 14)),
-    completed: false,
-  },
-];
+export const initialTasks: Task[] = [];
 
 export const initialTimetable: TimetableEntry[] = [
   {
