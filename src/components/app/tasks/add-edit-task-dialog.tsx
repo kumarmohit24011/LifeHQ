@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -28,11 +28,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, Sparkles, Loader2 } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import type { Task, Priority } from "@/lib/types";
 import { useAppContext } from "@/context/app-context";
 import { useToast } from "@/hooks/use-toast";
-import { suggestTaskDetails } from "@/ai/flows/ai-suggest-task-details";
 
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required."),
@@ -50,9 +49,8 @@ interface AddEditTaskDialogProps {
 }
 
 export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialogProps) {
-  const { tasks, timetable, addTask, updateTask } = useAppContext();
+  const { addTask, updateTask } = useAppContext();
   const { toast } = useToast();
-  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
@@ -90,44 +88,13 @@ export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialog
     }
   };
 
-  const handleSuggestDetails = async () => {
-    const taskDescription = form.getValues("description");
-    if (!taskDescription) {
-      form.setError("description", { message: "Please enter a description first." });
-      return;
-    }
-    
-    setIsAiLoading(true);
-    try {
-      const scheduleText = `Current Tasks:\n${tasks.map(t => `- ${t.title} (Due: ${format(t.deadline, "yyyy-MM-dd")})`).join('\n')}\n\nCurrent Timetable:\n${timetable.map(e => `- ${e.subject} (${e.startTime}-${e.endTime})`).join('\n')}`;
-
-      const result = await suggestTaskDetails({
-        taskDescription,
-        currentSchedule: scheduleText,
-      });
-
-      if (result.suggestedPriority && result.suggestedDeadline) {
-        form.setValue("priority", result.suggestedPriority as Priority);
-        form.setValue("deadline", new Date(result.suggestedDeadline));
-        toast({ title: "AI Suggestion Applied!", description: "Priority and deadline have been updated." });
-      } else {
-        throw new Error("Invalid response from AI.");
-      }
-    } catch (error) {
-      console.error("AI suggestion failed:", error);
-      toast({ variant: "destructive", title: "AI Suggestion Failed", description: "Could not get suggestions. Please try again." });
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl">{task ? "Edit Task" : "Add a New Task"}</DialogTitle>
           <DialogDescription>
-            Fill in the details below. You can also use AI to suggest a priority and deadline.
+            Fill in the details below.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -221,11 +188,7 @@ export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialog
                 )}
               />
             </div>
-            <DialogFooter className="pt-4 gap-2 sm:justify-between">
-              <Button type="button" variant="outline" onClick={handleSuggestDetails} disabled={isAiLoading}>
-                {isAiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                Suggest Details
-              </Button>
+            <DialogFooter className="pt-4 sm:justify-end">
               <Button type="submit" size="lg">
                 {task ? "Save Changes" : "Create Task"}
               </Button>
