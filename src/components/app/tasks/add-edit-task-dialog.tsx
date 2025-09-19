@@ -123,21 +123,21 @@ export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialog
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{task ? "Edit Task" : "Add a New Task"}</DialogTitle>
+          <DialogTitle className="text-2xl">{task ? "Edit Task" : "Add a New Task"}</DialogTitle>
           <DialogDescription>
             Fill in the details below. You can also use AI to suggest a priority and deadline.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel className="font-semibold">Title</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Finish project proposal" {...field} />
                   </FormControl>
@@ -150,7 +150,7 @@ export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialog
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel className="font-semibold">Description</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Add more details about your task..." {...field} />
                   </FormControl>
@@ -164,7 +164,7 @@ export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialog
                 name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Priority</FormLabel>
+                    <FormLabel className="font-semibold">Priority</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -186,7 +186,7 @@ export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialog
                 name="deadline"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Deadline</FormLabel>
+                    <FormLabel className="font-semibold">Deadline</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -226,7 +226,7 @@ export function AddEditTaskDialog({ isOpen, setIsOpen, task }: AddEditTaskDialog
                 {isAiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                 Suggest Details
               </Button>
-              <Button type="submit">
+              <Button type="submit" size="lg">
                 {task ? "Save Changes" : "Create Task"}
               </Button>
             </DialogFooter>
