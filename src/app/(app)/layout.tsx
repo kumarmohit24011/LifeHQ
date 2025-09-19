@@ -27,7 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </SidebarContent>
         </Sidebar>
         <SidebarInset>
-          <header className="flex h-14 items-center gap-4 border-b bg-background/95 px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30 backdrop-blur-xl">
+          <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
             <SidebarTrigger />
             <div className="w-full flex-1" />
             <UserNav />
