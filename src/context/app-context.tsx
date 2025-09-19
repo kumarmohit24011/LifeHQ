@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, type ReactNode }
 import { ref, onValue, set, push, child, remove } from "firebase/database";
 import { db } from '@/lib/firebase';
 import type { Task, TimetableEntry, Note } from '@/lib/types';
-import { initialTasks, initialTimetable, initialNotes } from '@/lib/data';
+import { useAuth } from './auth-context';
 
 interface AppContextType {
   tasks: Task[];
@@ -27,51 +27,23 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Function to seed initial data if the database is empty
-const seedDatabase = () => {
-  const tasksRef = ref(db, 'tasks');
-  onValue(tasksRef, (snapshot) => {
-    if (!snapshot.exists()) {
-      const initialTasksWithIds = initialTasks.reduce((acc, task) => {
-        acc[task.id] = { ...task, deadline: task.deadline.toISOString() };
-        return acc;
-      }, {} as any);
-      set(ref(db, 'tasks'), initialTasksWithIds);
-    }
-  }, { onlyOnce: true });
-
-  const timetableRef = ref(db, 'timetable');
-  onValue(timetableRef, (snapshot) => {
-    if (!snapshot.exists()) {
-      const initialTimetableWithIds = initialTimetable.reduce((acc, entry) => {
-        acc[entry.id] = entry;
-        return acc;
-      }, {} as any);
-      set(ref(db, 'timetable'), initialTimetableWithIds);
-    }
-  }, { onlyOnce: true });
-  
-  const notesRef = ref(db, 'notes');
-  onValue(notesRef, (snapshot) => {
-    if (!snapshot.exists()) {
-      const initialNotesWithIds = initialNotes.reduce((acc, note) => {
-        acc[note.id] = { ...note, createdAt: note.createdAt.toISOString() };
-        return acc;
-      }, {} as any);
-      set(ref(db, 'notes'), initialNotesWithIds);
-    }
-  }, { onlyOnce: true });
-};
-
 export function AppProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [tasks, setTasksState] = useState<Task[]>([]);
   const [timetable, setTimetableState] = useState<TimetableEntry[]>([]);
   const [notes, setNotesState] = useState<Note[]>([]);
 
-  useEffect(() => {
-    seedDatabase();
+  const userId = user?.uid;
 
-    const tasksRef = ref(db, 'tasks');
+  useEffect(() => {
+    if (!userId) {
+      setTasksState([]);
+      setTimetableState([]);
+      setNotesState([]);
+      return;
+    };
+
+    const tasksRef = ref(db, `users/${userId}/tasks`);
     const unsubscribeTasks = onValue(tasksRef, (snapshot) => {
       const data = snapshot.val();
       const loadedTasks: Task[] = data ? Object.entries(data).map(([key, value]: [string, any]) => ({
@@ -82,7 +54,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setTasksState(loadedTasks);
     });
 
-    const timetableRef = ref(db, 'timetable');
+    const timetableRef = ref(db, `users/${userId}/timetable`);
     const unsubscribeTimetable = onValue(timetableRef, (snapshot) => {
       const data = snapshot.val();
       const loadedTimetable: TimetableEntry[] = data ? Object.entries(data).map(([key, value]) => ({
@@ -92,7 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setTimetableState(loadedTimetable);
     });
 
-    const notesRef = ref(db, 'notes');
+    const notesRef = ref(db, `users/${userId}/notes`);
     const unsubscribeNotes = onValue(notesRef, (snapshot) => {
       const data = snapshot.val();
       const loadedNotes: Note[] = data ? Object.entries(data).map(([key, value]: [string, any]) => ({
@@ -108,72 +80,85 @@ export function AppProvider({ children }: { children: ReactNode }) {
       unsubscribeTimetable();
       unsubscribeNotes();
     };
-  }, []);
+  }, [userId]);
 
   const setTasks = async (tasks: Task[]) => {
+    if (!userId) return;
     const tasksWithIds = tasks.reduce((acc, task) => {
         acc[task.id] = { ...task, deadline: task.deadline.toISOString() };
         return acc;
       }, {} as any);
-    await set(ref(db, 'tasks'), tasksWithIds);
+    await set(ref(db, `users/${userId}/tasks`), tasksWithIds);
   };
   const addTask = async (task: Omit<Task, 'id' | 'completed'>) => {
-    const newId = push(child(ref(db), 'tasks')).key;
+    if (!userId) return;
+    const newId = push(child(ref(db), `users/${userId}/tasks`)).key;
     if (newId) {
-        await set(ref(db, `tasks/${newId}`), { ...task, completed: false, deadline: task.deadline.toISOString() });
+        await set(ref(db, `users/${userId}/tasks/${newId}`), { ...task, completed: false, deadline: task.deadline.toISOString() });
     }
   }
   const updateTask = async (task: Task) => {
-    await set(ref(db, `tasks/${task.id}`), { ...task, deadline: task.deadline.toISOString() });
+    if (!userId) return;
+    await set(ref(db, `users/${userId}/tasks/${task.id}`), { ...task, deadline: task.deadline.toISOString() });
   }
   const deleteTask = async (taskId: string) => {
-    await remove(ref(db, `tasks/${taskId}`));
+    if (!userId) return;
+    await remove(ref(db, `users/${userId}/tasks/${taskId}`));
   }
   const toggleTaskCompleted = async (taskId: string) => {
+    if (!userId) return;
     const task = tasks.find(t => t.id === taskId);
     if (task) {
-      await set(ref(db, `tasks/${taskId}/completed`), !task.completed);
+      await set(ref(db, `users/${userId}/tasks/${taskId}/completed`), !task.completed);
     }
   }
 
   const setTimetable = async (timetable: TimetableEntry[]) => {
+    if (!userId) return;
      const timetableWithIds = timetable.reduce((acc, entry) => {
         acc[entry.id] = entry;
         return acc;
       }, {} as any);
-    await set(ref(db, 'timetable'), timetableWithIds);
+    await set(ref(db, `users/${userId}/timetable`), timetableWithIds);
   };
   const addTimetableEntry = async (entry: Omit<TimetableEntry, 'id'>) => {
-    const newId = push(child(ref(db), 'timetable')).key;
+    if (!userId) return;
+    const newId = push(child(ref(db), `users/${userId}/timetable`)).key;
     if (newId) {
-        await set(ref(db, `timetable/${newId}`), entry);
+        await set(ref(db, `users/${userId}/timetable/${newId}`), entry);
     }
   }
   const updateTimetableEntry = async (entry: TimetableEntry) => {
-    await set(ref(db, `timetable/${entry.id}`), entry);
+    if (!userId) return;
+    await set(ref(db, `users/${userId}/timetable/${entry.id}`), entry);
   }
   const deleteTimetableEntry = async (entryId: string) => {
-    await remove(ref(db, `timetable/${entryId}`));
+    if (!userId) return;
+    await remove(ref(db, `users/${userId}/timetable/${entryId}`));
   }
 
   const setNotes = async (notes: Note[]) => {
+    if (!userId) return;
      const notesWithIds = notes.reduce((acc, note) => {
         acc[note.id] = { ...note, createdAt: note.createdAt.toISOString() };
         return acc;
       }, {} as any);
-    await set(ref(db, 'notes'), notesWithIds);
+    await set(ref(db, `users/${userId}/notes`), notesWithIds);
   };
    const addNote = async (note: Omit<Note, 'id' | 'createdAt'>) => {
-    const newId = push(child(ref(db), 'notes')).key;
+    if (!userId) return;
+    const newId = push(child(ref(db), `users/${userId}/notes`)).key;
     if (newId) {
-        await set(ref(db, `notes/${newId}`), { ...note, createdAt: new Date().toISOString() });
+        await set(ref(db, `users/${userId}/notes/${newId}`), { ...note, createdAt: new Date().toISOString() });
     }
   }
   const updateNote = async (note: Note) => {
-    await set(ref(db, `notes/${note.id}`), { ...note, createdAt: note.createdAt.toISOString() });
+    if (!userId) return;
+    await set(ref(db, `users/${userId}/notes/${note.id}`), { ...note, createdAt: note.createdAt.toISOString() });
   }
   const deleteNote = async (noteId: string) => {
-    await remove(ref(db, `notes/${noteId}`));
+    if (!userId) return;
+    await remove(ref(db, `users/${userId}/notes/${noteId}`));
   }
 
 

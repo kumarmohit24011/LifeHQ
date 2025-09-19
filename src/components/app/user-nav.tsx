@@ -10,8 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { useAuth } from "@/context/auth-context";
 
 export function UserNav() {
+  const { user, signOut } = useAuth();
   const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
 
   return (
@@ -27,9 +29,9 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">User</p>
+            <p className="text-sm font-medium leading-none">{user ? user.displayName || 'User' : 'User'}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              user@example.com
+              {user ? user.email : 'user@example.com'}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -43,7 +45,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={signOut}>
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
