@@ -46,33 +46,35 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-background">
-      <div className="flex flex-col items-center space-y-4">
-        <div className="flex items-center gap-2 text-2xl font-semibold">
-            <LifeHQLogo />
-            <h1>LifeHQ</h1>
+    <main className="flex items-center justify-center min-h-screen bg-background p-4">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col items-center space-y-4">
+            <div className="flex items-center gap-2 text-2xl font-semibold">
+                <LifeHQLogo />
+                <h1>LifeHQ</h1>
+            </div>
+            <Card className="w-full">
+            <CardHeader>
+                <CardTitle>Login</CardTitle>
+                <CardDescription>Enter your email below to login to your account.</CardDescription>
+            </CardHeader>
+            <form onSubmit={handleLogin}>
+                <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="login-email">Email</Label>
+                    <Input id="login-email" type="email" placeholder="m@example.com" required value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="login-password">Password</Label>
+                    <Input id="login-password" type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+                </div>
+                </CardContent>
+                <CardFooter>
+                <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Loading...' : 'Login'}</Button>
+                </CardFooter>
+            </form>
+            </Card>
         </div>
-        <Card className="w-[400px]">
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>Enter your email below to login to your account.</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleLogin}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
-                <Input id="login-email" type="email" placeholder="m@example.com" required value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
-                <Input id="login-password" type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Loading...' : 'Login'}</Button>
-            </CardFooter>
-          </form>
-        </Card>
       </div>
     </main>
   );
