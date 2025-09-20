@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppProvider } from '@/context/app-context';
 import { AuthProvider, AuthGuard } from '@/context/auth-context';
+import { SyncButton } from '@/components/app/sync-button';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -33,6 +34,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
                 <SidebarTrigger className="md:hidden" />
                 <div className="w-full flex-1" />
+                <SyncButton />
                 <UserNav />
               </header>
               <main className="flex-1 p-4 sm:p-6">{children}</main>
