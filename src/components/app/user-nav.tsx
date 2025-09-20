@@ -10,20 +10,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useAuth } from "@/context/auth-context";
 
 export function UserNav() {
   const { user, signOut } = useAuth();
-  const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
+  
+  const getInitials = (email?: string | null) => {
+    if (!email) return 'U';
+    return email.charAt(0).toUpperCase();
+  }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            {userAvatar && <AvatarImage src={userAvatar.imageUrl} alt="User Avatar" data-ai-hint={userAvatar.imageHint} />}
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarFallback>{getInitials(user?.email)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
