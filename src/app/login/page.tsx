@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LifeHQLogo } from "@/components/app/logo";
+import { AppLogo } from "@/components/app/logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,8 +50,8 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center space-y-4">
             <div className="flex items-center gap-2 text-2xl font-semibold">
-                <LifeHQLogo />
-                <h1>LifeHQ</h1>
+                <AppLogo />
+                <h1>Task2.0</h1>
             </div>
             <Card className="w-full">
             <CardHeader>

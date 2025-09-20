@@ -1,4 +1,4 @@
-export function LifeHQLogo() {
+export function AppLogo() {
   return (
     <svg
       width="32"

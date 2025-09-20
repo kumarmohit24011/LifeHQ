@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from '@/context/auth-context';
 
 export const metadata: Metadata = {
-  title: 'LifeHQ',
+  title: 'Task2.0',
   description: 'Manage Tasks, Timetables, and Notes in one place.',
 };
 

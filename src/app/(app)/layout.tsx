@@ -1,6 +1,6 @@
 import { MainNav } from '@/components/app/main-nav';
 import { UserNav } from '@/components/app/user-nav';
-import { LifeHQLogo } from '@/components/app/logo';
+import { AppLogo } from '@/components/app/logo';
 import {
   Sidebar,
   SidebarHeader,
@@ -22,8 +22,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Sidebar>
               <SidebarHeader>
                 <div className="p-2 flex items-center gap-2">
-                  <LifeHQLogo />
-                  <h1 className="text-xl font-semibold">LifeHQ</h1>
+                  <AppLogo />
+                  <h1 className="text-xl font-semibold">Task2.0</h1>
                 </div>
               </SidebarHeader>
               <SidebarContent>
